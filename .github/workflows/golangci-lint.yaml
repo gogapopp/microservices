@@ -46,9 +46,9 @@ jobs:
       - name: Run golangci-lint on auth service
         uses: golangci/golangci-lint-action@v3
         with:
-          working-directory: microservices/auth
+          working-directory: auth
 
       - name: Run golangci-lint on chat-server service
         uses: golangci/golangci-lint-action@v3
         with:
-          working-directory: microservices/chat-server
+          working-directory: chat-server
