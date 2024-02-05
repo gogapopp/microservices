@@ -25,22 +25,22 @@ jobs:
 
       - name: Run staticcheck on auth service
         run: |
-          cd microservices/auth
+          cd auth
           staticcheck ./...
 
       - name: Run staticcheck on chat-server service
         run: |
-          cd microservices/chat-server
+          cd chat-server
           staticcheck ./...
 
       - name: Run vet on auth service
         run: |
-          cd microservices/auth
+          cd auth
           go vet ./...
 
       - name: Run vet on chat-server service
         run: |
-          cd microservices/chat-server
+          cd chat-server
           go vet ./...
 
       - name: Run golangci-lint on auth service
