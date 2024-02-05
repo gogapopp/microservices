@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  REGISTRY: "cr.selcloud.ru/gogapopp"
+  IMAGE_NAME_AUTH: "auth-server"
+  IMAGE_NAME_CHAT: "chat-server"
+  CONTAINER_NAME_AUTH: "auth-server-container"
+  CONTAINER_NAME_CHAT: "chat-server-container"
+
+jobs:
+  image-build-and-push-auth:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Registry
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+
+      - name: Build and Push Docker Image for Auth
+        run: |
+          TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+          docker buildx create --use
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_AUTH:$TAG_NAME -f auth/Dockerfile auth/
+
+  image-build-and-push-chat:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Registry
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+
+      - name: Build and Push Docker Image for Chat
+        run: |
+          TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+          docker buildx create --use
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_CHAT:$TAG_NAME -f chat-server/Dockerfile chat-server/
+
+  deploy-image-auth:
+    runs-on: ubuntu-latest
+    needs: image-build-and-push-auth
+
+    steps:
+      - name: Deploy Auth to Selectel Cloud via SSH action
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSHKEY }}
+          envs: IMAGE_NAME_AUTH,REGISTRY,GITHUB_SHA,CONTAINER_NAME_AUTH
+          script: |
+            # Set up variables
+            TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+            
+            # Login into Selectel Registry
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+            
+            # Stop running container
+            docker stop $CONTAINER_NAME_AUTH
+            
+            # Remove old container
+            docker rm $CONTAINER_NAME_AUTH
+            
+            # Run a new container from a new image
+            docker run -d -p 8082:8082 --name $CONTAINER_NAME_AUTH -t $REGISTRY/$IMAGE_NAME_AUTH:$TAG_NAME
+
+  deploy-image-chat:
+    runs-on: ubuntu-latest
+    needs: image-build-and-push-chat
+
+    steps:
+      - name: Deploy Chat to Selectel Cloud via SSH action
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSHKEY }}
+          envs: IMAGE_NAME_CHAT,REGISTRY,GITHUB_SHA,CONTAINER_NAME_CHAT
+          script: |
+            # Set up variables
+            TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+            
+            # Login into Selectel Registry
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+            
+            # Stop running container
+            docker stop $CONTAINER_NAME_CHAT
+            
+            # Remove old container
+            docker rm $CONTAINER_NAME_CHAT
+            
+            # Run a new container from a new image
+            docker run -d -p 8081:8081 --name $CONTAINER_NAME_CHAT -t $REGISTRY/$IMAGE_NAME_CHAT:$TAG_NAME
