@@ -1,4 +1,4 @@
-FROM golang:1.20.3-alpine AS builder
+FROM golang:1.21-alpine AS builder
 
 COPY . /github.com/gogapopp/microservices/chat-server/source/
 WORKDIR /github.com/gogapopp/microservices/chat-server/source/
