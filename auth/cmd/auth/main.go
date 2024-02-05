@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -13,7 +12,7 @@ import (
 
 func main() {
 	grpcserver := handler.NewGRPCServer()
-	listen, err := net.Listen("tcp", "localhost:8081")
+	listen, err := net.Listen("tcp", ":8082")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,7 +22,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
-	fmt.Println("chat server is running at :8081")
+	log.Printf("server listening at %v", listen.Addr())
 	sigint := make(chan os.Signal, 1)
 	signal.Notify(sigint, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	<-sigint
