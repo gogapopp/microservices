@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  gophkeepertest:
+  microservicestest:
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -23,11 +23,32 @@ jobs:
       - name: Install staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: Run staticcheck
-        run: staticcheck ./...
+      - name: Run staticcheck on auth service
+        run: |
+          cd microservices/auth
+          staticcheck ./...
 
-      - name: Run vet
-        run: go vet ./...
+      - name: Run staticcheck on chat-server service
+        run: |
+          cd microservices/chat-server
+          staticcheck ./...
 
-      - name: Run golangci-lint
+      - name: Run vet on auth service
+        run: |
+          cd microservices/auth
+          go vet ./...
+
+      - name: Run vet on chat-server service
+        run: |
+          cd microservices/chat-server
+          go vet ./...
+
+      - name: Run golangci-lint on auth service
         uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: microservices/auth
+
+      - name: Run golangci-lint on chat-server service
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: microservices/chat-server
