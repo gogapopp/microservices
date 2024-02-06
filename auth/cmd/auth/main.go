@@ -29,6 +29,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
+
 	con, err := pgx.Connect(ctx, dbDSN)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
