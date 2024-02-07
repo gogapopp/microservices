@@ -1,13 +1,27 @@
 package handler
 
 import (
+	"time"
+
 	pb "github.com/gogapopp/microservices/auth/api/auth_v1"
+	"github.com/gogapopp/microservices/auth/models"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"context"
 )
 
 func (g *GRPCServer) Create(ctx context.Context, req *pb.CreateRequest) (*pb.CreateResponse, error) {
+	err := g.repository.Create(ctx, models.User{
+		Userame:  "german",
+		Email:    "german@email.com",
+		Password: "german",
+		Role:     "1",
+		CreateAt: time.Now(),
+		UpdateAt: time.Now(),
+	})
+	if err == nil {
+		return nil, nil
+	}
 	return &pb.CreateResponse{
 		Id: 1,
 	}, nil

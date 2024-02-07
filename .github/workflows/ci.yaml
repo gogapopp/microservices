@@ -79,9 +79,6 @@ jobs:
             
             # Run a new container from a new image
             docker run -d -p 8082:8082 --name $CONTAINER_NAME_AUTH -t $REGISTRY/$IMAGE_NAME_AUTH:$TAG_NAME
-            
-            # Docker compose up
-            docker-compose -f auth/docker-compose.yaml up --build -d
 
   deploy-image-chat:
     runs-on: ubuntu-latest
@@ -110,6 +107,3 @@ jobs:
             
             # Run a new container from a new image
             docker run -d -p 8081:8081 --name $CONTAINER_NAME_CHAT -t $REGISTRY/$IMAGE_NAME_CHAT:$TAG_NAME
-
-            # Docker compose up
-            docker-compose -f chat-server/docker-compose.yaml up --build -d
