@@ -78,7 +78,7 @@ jobs:
             docker rm $CONTAINER_NAME_AUTH
             
             # Run a new container from a new image
-            docker run -d -p 8082:8082 --name $CONTAINER_NAME_AUTH -v /var/lib/sqlite/data_auth:/root/storage.db -t $REGISTRY/$IMAGE_NAME_AUTH:$TAG_NAME
+            docker run -d -p 8082:8082 --name $CONTAINER_NAME_AUTH -t $REGISTRY/$IMAGE_NAME_AUTH:$TAG_NAME
 
   deploy-image-chat:
     runs-on: ubuntu-latest
@@ -106,4 +106,4 @@ jobs:
             docker rm $CONTAINER_NAME_CHAT
             
             # Run a new container from a new image
-            docker run -d -p 8081:8081 --name $CONTAINER_NAME_CHAT -v /var/lib/sqlite/data_chat:/root/storage.db -t $REGISTRY/$IMAGE_NAME_CHAT:$TAG_NAME
+            docker run -d -p 8081:8081 --name $CONTAINER_NAME_CHAT -t $REGISTRY/$IMAGE_NAME_CHAT:$TAG_NAME
