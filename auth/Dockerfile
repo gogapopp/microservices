@@ -1,10 +1,10 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.21 AS builder
 
 COPY . /github.com/gogapopp/microservices/auth/source/
 WORKDIR /github.com/gogapopp/microservices/auth/source/
 
 RUN go mod download
-RUN go build -o ./bin/auth_server cmd/auth/main.go
+RUN CGO_ENABLED=1 go build -o ./bin/auth_server cmd/auth/main.go
 
 FROM alpine:latest
 

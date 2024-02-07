@@ -1,10 +1,10 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.21 AS builder
 
 COPY . /github.com/gogapopp/microservices/chat-server/source/
 WORKDIR /github.com/gogapopp/microservices/chat-server/source/
 
 RUN go mod download
-RUN go build -o ./bin/chat_server cmd/chat-server/main.go
+RUN CGO_ENABLED=1 go build -o ./bin/chat_server cmd/chat-server/main.go
 
 FROM alpine:latest
 
