@@ -1,4 +1,6 @@
-FROM golang:1.21 AS builder
+FROM golang:1.21-alpine AS builder
+
+RUN apk add --no-cache --update go gcc g++
 
 COPY . /github.com/gogapopp/microservices/chat-server/source/
 WORKDIR /github.com/gogapopp/microservices/chat-server/source/
